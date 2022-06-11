@@ -9,3 +9,5 @@ from constant import env_code
 HOST = '0.0.0.0'
 PORT = 9527
 ENV = env_code.DEV
+
+USE_THREAD = False

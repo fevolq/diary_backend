@@ -14,16 +14,27 @@ FAIL_CODE = 500
 def success_response():
     return_response = {
         'code': SUCCESS_CODE,
-        # 'required_id': g.call['required_id']
     }
+    if g.get('call', {}).get('required_id'):
+        return_response['required_id'] = g.call['required_id']
     return return_response
 
 
 def error_response(msg=''):
     return_response = {
         'code': ERROR_CODE,
-        # 'required_id': g.call['required_id']
     }
+    if g.get('call', {}).get('required_id'):
+        return_response['required_id'] = g.call['required_id']
     if msg:
         return_response['message_content'] = msg
+    return return_response
+
+
+def failure_response():
+    return_response = {
+        'code': FAIL_CODE,
+    }
+    if g.get('call', {}).get('required_id'):
+        return_response['required_id'] = g.call['required_id']
     return return_response

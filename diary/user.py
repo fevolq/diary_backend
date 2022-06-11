@@ -2,7 +2,7 @@
 # python3.7
 # @Author:fuq666@qq.com
 # Create time: 2022/6/4 19:55
-# Filename:用户注册、登录与退出
+# Filename: 用户注册、登录与退出
 
 from flask import Blueprint, request, session, g
 
@@ -12,10 +12,10 @@ from .module.User import user_token, User
 
 
 # 蓝图注册：url_prefix会加在所有route之前
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+user_bp = Blueprint('user', __name__, url_prefix='/user')
 
 
-@bp.route('/register')
+@user_bp.route('/register')
 def register():
     if request.method != 'POST':
         return gen_response.error_response()
@@ -55,7 +55,7 @@ def register():
     return response
 
 
-@bp.route('/login')
+@user_bp.route('/login')
 def login():
     if request.method != 'POST':
         return gen_response.error_response()
@@ -92,13 +92,13 @@ def login():
     return response
 
 
-@bp.route('/logout')
+@user_bp.route('/logout')
 def logout():
     session.clear()
     return gen_response.success_response()
 
 
-@bp.before_app_request
+@user_bp.before_app_request
 def load_logged_in_user():
     user = session.get('user', None)
     if user is None:
