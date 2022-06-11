@@ -7,31 +7,33 @@
 from .db import get_db
 
 
-# def mysql_execute(sql: str, args: list = [], db_name='diary'):
-#     """
-#     :param sql:
-#     :param args:
-#     :param db_name:
-#     :return:
-#     """
-#     try:
-#         conn = get_db(db_name, db_type='mysql')
-#         cursor = conn.cursor()
-#         sql = sql.replace('\'%s\'', '%s').strip()
-#         if sql.startswith('SELECT'):
-#             cursor.execute(sql, args)
-#             result = cursor.fetchall()
-#         else:
-#             if not args:
-#                 result = cursor.execute(sql, args)
-#             elif isinstance(args[0], (list, tuple)):
-#                 result = cursor.executemany(sql, args)
-#             else:
-#                 result = cursor.execute(sql, args)
-#         conn.commit()
-#     except Exception as e:
-#         conn.rollback()
-#         res = {'error': str(e)}
+def mysql_execute(sql: str, args: list = [], db_name='diary'):
+    """
+    :param sql:
+    :param args:
+    :param db_name:
+    :return:
+    """
+    conn = get_db(db_name, db_type='mysql')
+    cursor = conn.cursor()
+    try:
+        sql = sql.replace('\'%s\'', '%s').strip()
+        if sql.startswith('SELECT'):
+            cursor.execute(sql, args)
+            result = cursor.fetchall()
+        else:
+            if not args:
+                result = cursor.execute(sql, args)
+            elif isinstance(args[0], (list, tuple)):
+                result = cursor.executemany(sql, args)
+            else:
+                result = cursor.execute(sql, args)
+        conn.commit()
+        res = {'result': result}
+    except Exception as e:
+        conn.rollback()
+        res = {'error': str(e)}
+    return res
 
 
 def mysql_execute_sqls(sql_with_args_list: list, db_name='diary'):

@@ -10,12 +10,13 @@ import time
 from functools import wraps
 
 import flask
-from flask import Flask, request
+from flask import Flask, request, session, g
 from flask.typing import ResponseReturnValue
 from flask.views import View
 
 from conf import reg_route
-from utils import util
+from module.User import User
+from utils import util, db
 from constant import gen_response
 
 # 日志初始化
@@ -83,11 +84,22 @@ def g_args(args):
 
 @app.before_request
 def before_call():
-    pass
+    if request.path not in ('/user/register', '/user/login'):
+        # 与全局变量中加入用户对象
+        token = session.get('token', None)
+        if token is None:
+            return gen_response.error_response('请重新登录')
+        uid = User.load_user_redis(token)
+        if uid is None:
+            return gen_response.error_response('请重新登录')
+        user = User.User(uid)
+        user_info = g_args('user_info')
+        user_info['user'] = user
 
 
 @app.after_request
 def after_call(response):
+    db.close_db()
     return response
 
 

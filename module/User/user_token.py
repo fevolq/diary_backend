@@ -6,26 +6,45 @@
 import hashlib
 import secrets
 
-SALT_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.!?[]%#@&*"
-salt_length = 16
+import bcrypt
+
+CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.!?[]%#@&*"
+SALT_LENGTH = 16
+SECRET_KEY = 'F___Q'
 
 
 def gen_salt() -> str:
-    """Generate a random string of SALT_CHARS with specified ``length``."""
-    if salt_length <= 0:
+    """生成随机固定字符串"""
+    if SALT_LENGTH <= 0:
         raise ValueError("Salt length must be positive")
 
-    return "".join(secrets.choice(SALT_CHARS) for _ in range(salt_length))
+    return "".join(secrets.choice(CHARS) for _ in range(SALT_LENGTH))
 
 
-def gen_token(password, salt) -> str:
+def bcrypt_pwd(password) -> str:
+    """
+    对明文密码初次加密
+    :param password: 明文密码
+    :return:
+    """
+    bcrypt_str = bcrypt.hashpw(password.encode(), SECRET_KEY.encode())
+    return bcrypt_str.decode()
+
+
+def gen_bcrypt_str(password, salt) -> str:
+    bcrypt_str = bcrypt_pwd(password)
     if salt[-1].isdigit():
-        result = hashlib.md5(str(salt+password).encode("utf8"))
+        result = hashlib.md5(str(salt + bcrypt_str).encode("utf8"))
     else:
-        result = hashlib.sha1(str(salt+password).encode("utf8"))
+        result = hashlib.sha1(str(salt + bcrypt_str).encode("utf8"))
     return result.hexdigest()
 
 
-def check_token(password, salt_record, token_record):
-    token = gen_token(password, salt_record)
-    return token == token_record
+def check_pwd(password, salt_record, bcrypt_str_record):
+    bcrypt_str = gen_bcrypt_str(password, salt_record)
+    return bcrypt_str == bcrypt_str_record
+
+
+def gen_token() -> str:
+    token = "".join(secrets.choice(CHARS) for _ in range(32))
+    return token

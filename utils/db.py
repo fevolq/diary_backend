@@ -4,6 +4,7 @@
 # Create time: 2022/6/4 19:05
 # Filename:数据库的连接
 import pymysql
+import redis as redis
 from flask import g
 
 from conf import db_conf
@@ -16,21 +17,20 @@ def get_db(db_name: str, db_type: str = 'mysql'):
     :param db_type: 数据库类型
     :return: 数据库的连接
     """
-    dbs = g.get('dbs', {}).get(db_type, {})
+    dbs = g.setdefault('dbs', {})
     db_name = db_name.lower()
     db_type = db_type.lower()
-    conn = None
-    if not dbs:
+    if not dbs.get(db_type, {}):
         if db_type.lower() == 'mysql':
             conn = mysql_conn(db_name)
-            g.dbs[db_type][db_name] = conn
-        elif db_type.lower() == 'mysql':
-            conn = mysql_conn(db_name)
-            g.dbs[db_type][db_name] = conn
+            dbs[db_type][db_name] = conn
+        elif db_type.lower() == 'redis':
+            conn = redis_conn(db_name)
+            dbs[db_type][db_name] = conn
         else:
             raise Exception(f'没有{db_type}数据库类型')
     else:
-        conn = g.dbs[db_type][db_name]
+        conn = dbs[db_type][db_name]
     return conn
 
 
@@ -75,4 +75,16 @@ def postgres_conn(db_name):
         #                        )
     else:
         raise Exception(f'Postgres中没有 {db_name} 实例')
+    return conn
+
+
+def redis_conn(db_name):
+    if db_name in db_conf.REDIS_DB:
+        conn = redis.StrictRedis(host=db_conf.REDIS_HOST,
+                                 port=db_conf.REDIS_PORT,
+                                 username=db_conf.REDIS_USER,
+                                 password=db_conf.REDIS_PWD,
+                                 db=db_conf.REDIS_DB[db_name])
+    else:
+        raise Exception(f'Redis中没有 {db_name} 实例')
     return conn

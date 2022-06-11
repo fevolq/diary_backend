@@ -9,3 +9,11 @@ MYSQL_PORT = 6379
 MYSQL_USER = 'root'
 MYSQL_PWD = 'root'
 MYSQL_DB = 'diary'
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
+REDIS_USER = 'root'
+REDIS_PWD = 'root'
+REDIS_DB = {
+    'user': 0
+}
