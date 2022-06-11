@@ -2,7 +2,7 @@
 # python3.7
 # @Author:fuq666@qq.com
 # Create time: 2022/6/4 21:10
-# Filename:生成与校验token
+# Filename: 生成与校验token
 import hashlib
 import secrets
 

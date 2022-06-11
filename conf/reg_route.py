@@ -4,6 +4,6 @@
 # Create time: 2022/6/4 19:59
 # Filename:
 
-from diary import user
+from module import user
 
 bp_route = [user.user_bp, ]

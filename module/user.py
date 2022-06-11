@@ -8,8 +8,8 @@ from flask import Blueprint, request, session, g
 
 from constant import gen_response
 from utils import sql_builder, sql_execute
-from .module.User import user_token, User
-
+from module.User import User
+from module.User import user_token
 
 # 蓝图注册：url_prefix会加在所有route之前
 user_bp = Blueprint('user', __name__, url_prefix='/user')
@@ -100,7 +100,7 @@ def logout():
 
 @user_bp.before_app_request
 def load_logged_in_user():
-    user = session.get('user', None)
+    user = session.get('User', None)
     if user is None:
         g.user = None
     else:

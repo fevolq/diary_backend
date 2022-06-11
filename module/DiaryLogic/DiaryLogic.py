@@ -15,7 +15,7 @@ class DiaryLogic:
         pass
 
     @api_route('test', methods=['GET', 'POST'])
-    def add(self, request, req_dic):
+    def test(self, request, req_dic):
         resp = gen_response.success_response()
         resp.update({'meg': 'test'})
         return resp

@@ -4,7 +4,7 @@
 # Create time: 2022/6/11 17:15
 # Filename:
 
-from diary.module.DiaryLogic.DiaryLogic import DiaryLogic
+from module.DiaryLogic.DiaryLogic import DiaryLogic
 
 
 class Logic:
