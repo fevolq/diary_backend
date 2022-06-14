@@ -13,6 +13,7 @@ from module.User import user_token
 
 # 蓝图注册：url_prefix会加在所有route之前
 user_bp = Blueprint('user', __name__, url_prefix='/user')
+# TODO：蓝图的POST请求
 
 
 @user_bp.route('/register')
@@ -36,7 +37,7 @@ def register():
     else:
         sql, args = sql_builder.gen_select_sql(table, ['%*'], condition={'email': {'=': email}}, limit=1)
         res = sql_execute.mysql_execute_sqls([{'sql': sql, 'args': args}])
-        if res.get('result', 1) != 0:
+        if res.get('result', []):
             message_content = f'Email {email} is already registered'
         else:
             salt = user_token.gen_salt()
@@ -57,23 +58,24 @@ def register():
 
 @user_bp.route('/login')
 def login():
-    if request.method != 'POST':
-        return gen_response.error_response()
+    # TODO：要使用POST
+    # if request.method != 'POST':
+    #     return gen_response.error_response()
 
     form_data = request.form
     email = form_data.get('email', '')
     pwd = form_data.get('pwd', '')
 
     message_content = None
-    table = 'user'
+    table = User.User.table
     if not email:
         message_content = 'Email is required'
     elif not pwd:
         message_content = 'Password is required'
     else:
-        sql, args = sql_builder.gen_select_sql(table, ['id', 'salt', 'bcrypt_str'], condition={'email': email}, limit=1)
+        sql, args = sql_builder.gen_select_sql(table, ['id', 'salt', 'bcrypt_str'], condition={'email': {'=': email}}, limit=1)
         res = sql_execute.mysql_execute_sqls([{'sql': sql, 'args': args}])
-        if res.get('result', 0) != 1:
+        if not res.get('result', []):
             message_content = f'Email {email} is not registered'
         else:
             uid = res['result'][0]['id']
@@ -84,7 +86,7 @@ def login():
             else:
                 session.clear()
                 token = user_token.gen_token()
-                result = User.insert_user_redis(token, uid)
+                result = User.insert_user_redis(token, {'id': uid, 'email': email})
                 if result:
                     session['token'] = token
                 else:
@@ -94,6 +96,8 @@ def login():
         response = gen_response.error_response(message_content)
     else:
         response = gen_response.success_response()
+        # TODO: token的返回优化
+        response['token'] = session['token']
 
     return response
 
@@ -107,6 +111,6 @@ def logout():
 @user_bp.route('/info')
 def info():
     response = gen_response.success_response()
-    user = flask.g.user_info    # 用户对象
-    response.update({'info': user.ui_user_info()})
+    user_info = flask.g.user_info    # 用户相关的对象
+    response.update({'info': user_info['user'].ui_user_info()})
     return response

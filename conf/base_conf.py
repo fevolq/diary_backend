@@ -2,7 +2,7 @@
 # python3.7
 # @Author:fuq666@qq.com
 # Create time: 2022/6/4 22:30
-# Filename:
+# Filename: 应用配置
 
 from constant import env_code
 
