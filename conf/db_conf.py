@@ -5,7 +5,7 @@
 # Filename:
 
 MYSQL_HOST = '127.0.0.1'
-MYSQL_PORT = 6379
+MYSQL_PORT = 3306
 MYSQL_USER = 'root'
 MYSQL_PWD = 'root'
 MYSQL_DB = 'diary'

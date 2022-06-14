@@ -74,7 +74,7 @@ class TemplateView(View):
             return respond
 
 
-# 全局g参数
+# 设置或去除全局参数g
 def g_args(args):
     value = flask.g.get(args, None)
     if value is None:
@@ -85,14 +85,16 @@ def g_args(args):
 @app.before_request
 def before_call():
     if request.path not in ('/user/register', '/user/login'):
-        # 与全局变量中加入用户对象
-        token = session.get('token', None)
+        # 全局变量中加入用户对象
+        token = request.headers.get('token', None)
         if token is None:
             return gen_response.error_response('请重新登录')
-        uid = User.load_user_redis(token)
-        if uid is None:
+        redis_user_info = User.load_user_redis(token)
+        if not redis_user_info:
             return gen_response.error_response('请重新登录')
-        user = User.User(uid)
+        user = User.User(redis_user_info['id'])
+        if user.email != redis_user_info['email']:      # 校验token是否属于该用户
+            return gen_response.error_response('账号不符，请重新登录')
         user_info = g_args('user_info')
         user_info['user'] = user
 

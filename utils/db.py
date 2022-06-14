@@ -20,13 +20,14 @@ def get_db(db_name: str, db_type: str = 'mysql'):
     dbs = g.setdefault('dbs', {})
     db_name = db_name.lower()
     db_type = db_type.lower()
-    if not dbs.get(db_type, {}):
+    db = dbs.setdefault(db_type, {})
+    if not db.get(db_name, None):
         if db_type.lower() == 'mysql':
             conn = mysql_conn(db_name)
-            dbs[db_type][db_name] = conn
+            db[db_name] = conn
         elif db_type.lower() == 'redis':
             conn = redis_conn(db_name)
-            dbs[db_type][db_name] = conn
+            db[db_name] = conn
         else:
             raise Exception(f'没有{db_type}数据库类型')
     else:
@@ -82,8 +83,8 @@ def redis_conn(db_name):
     if db_name in db_conf.REDIS_DB:
         conn = redis.StrictRedis(host=db_conf.REDIS_HOST,
                                  port=db_conf.REDIS_PORT,
-                                 username=db_conf.REDIS_USER,
-                                 password=db_conf.REDIS_PWD,
+                                 # username=db_conf.REDIS_USER,
+                                 # password=db_conf.REDIS_PWD,
                                  db=db_conf.REDIS_DB[db_name])
     else:
         raise Exception(f'Redis中没有 {db_name} 实例')
