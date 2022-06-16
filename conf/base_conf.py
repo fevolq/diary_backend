@@ -11,3 +11,5 @@ PORT = 9527
 ENV = env_code.DEV
 
 USE_THREAD = False
+
+NOT_CHECK_API = ['/', '/user/register', '/user/login']

@@ -14,7 +14,7 @@ from flask import Flask, request, session, g
 from flask.typing import ResponseReturnValue
 from flask.views import View
 
-from conf import reg_route
+from conf import reg_route, base_conf
 from module.User import User
 from utils import util, db
 from constant import gen_response
@@ -84,7 +84,7 @@ def g_args(args):
 
 @app.before_request
 def before_call():
-    if request.path not in ('/user/register', '/user/login'):
+    if request.path not in base_conf.NOT_CHECK_API:
         # 全局变量中加入用户对象
         token = request.headers.get('token', None)
         if token is None:
