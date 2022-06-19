@@ -43,14 +43,13 @@ def close_db():
 
 
 def mysql_conn(db_name):
-    conn = None
     if db_name == 'diary':
         conn = pymysql.connect(host=db_conf.MYSQL_HOST,
                                port=db_conf.MYSQL_PORT,
                                user=db_conf.MYSQL_USER,
                                passwd=db_conf.MYSQL_PWD,
                                db=db_conf.MYSQL_DB,
-                               connect_timeout=15.0,
+                               connect_timeout=15,
                                charset='utf8',
                                autocommit=True,
                                cursorclass=pymysql.cursors.DictCursor
@@ -85,7 +84,8 @@ def redis_conn(db_name):
                                  port=db_conf.REDIS_PORT,
                                  # username=db_conf.REDIS_USER,
                                  # password=db_conf.REDIS_PWD,
-                                 db=db_conf.REDIS_DB[db_name])
+                                 db=db_conf.REDIS_DB[db_name],
+                                 socket_timeout=15,)
     else:
         raise Exception(f'Redis中没有 {db_name} 实例')
     return conn
